@@ -6,7 +6,7 @@ sys.path.insert(0, str(ROOT))
 
 import pandas as pd
 import streamlit as st
-from utils.sentiment import analyze_text, analyze_sentences, load_transformer_pipeline
+from utils.sentiment import analyze_text, analyze_sentences, load_transformer_pipeline, ROBERTA_ENABLED
 from utils.charts import compound_gauge, score_bars
 from utils.sidebar import render_sidebar
 from utils.styles import page_header, section, divider, badges, disagree_banner
@@ -54,10 +54,14 @@ user_text = st.text_area(
 
 ctrl_left, ctrl_right = st.columns([3, 2])
 with ctrl_left:
-    use_roberta = st.checkbox(
-        "Use RoBERTa  ·  more accurate, ~500 MB first-run download",
-        value=True,
-    )
+    if ROBERTA_ENABLED:
+        use_roberta = st.checkbox(
+            "Use RoBERTa  ·  more accurate, ~500 MB first-run download",
+            value=False,
+        )
+    else:
+        use_roberta = False
+        st.caption("RoBERTa is disabled on this deployment — VADER + TextBlob active.")
 with ctrl_right:
     analyze_btn = st.button("Analyze Sentiment", type="primary", use_container_width=True)
 

@@ -2,6 +2,7 @@ from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from textblob import TextBlob
 import pandas as pd
 import nltk
+import os
 
 for _resource in ["punkt", "punkt_tab"]:
     try:
@@ -12,8 +13,14 @@ for _resource in ["punkt", "punkt_tab"]:
 _analyzer = SentimentIntensityAnalyzer()
 _TRANSFORMER_MODEL = "cardiffnlp/twitter-roberta-base-sentiment-latest"
 
+# Set DISABLE_TRANSFORMERS=1 on memory-constrained deployments (e.g. Heroku basic dynos).
+# When disabled, load_transformer_pipeline() returns None and torch is never imported.
+ROBERTA_ENABLED = os.getenv("DISABLE_TRANSFORMERS", "0") == "0"
+
 
 def load_transformer_pipeline():
+    if not ROBERTA_ENABLED:
+        return None
     from transformers import pipeline as hf_pipeline
     return hf_pipeline(
         "text-classification",
